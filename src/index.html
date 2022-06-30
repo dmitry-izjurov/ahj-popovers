@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrapper">
+    <ul class="list">
+      <li class="item hidden">
+        <img src="./img/mir.jpg" class="card" id="mir">
+      </li>
+      <li class="item hidden">
+        <img src="./img/mastercard_curved.png" class="card" id="mastercard">
+      </li>
+      <li class="item hidden">
+        <img src="./img/visa_curved.png" class="card" id="visa">
+      </li>
+      <li class="item hidden">
+        <img src="./img/maestro_curved.png" class="card" id="maestro">
+      </li>
+    </ul>
+  </div>
+  <form class="form">
+    <label class="field-group">
+      <input type="text" class="field" minlength="13" maxlength="19" placeholder="Credit card number" required>
+    </label>
+    <button type="submit" class="form__button">Click to Validate</button>
+  </form>
+</body>
+</html>
