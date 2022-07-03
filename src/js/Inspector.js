@@ -1,87 +1,73 @@
 import {
-  visa, visaCard, masterCard, masterCardCard, maestro, maestroCard, mir, mirCard, cards,
+  wrapperButton, wrapperTop, printTopBottom, buttons,
 } from './utils';
 
 export default class Inspector {
-  constructor(numberCard) {
-    this.numberCard = numberCard;
-    this.numberCardResult = this.getNumberCardSplit();
+  constructor() {
+    this.topOrBottom = undefined;
+    this.oldElem = undefined;
   }
 
-  getNumberCardSplit() {
-    const arr = this.numberCard.split('').map((a) => Number(a));
-    for (let i = 0; i < arr.length; i += 1) {
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(arr[i])) {
-        document.querySelector('.form').reset();
-        this.numberCard = undefined;
-        alert('Введите номер карты');
-        return undefined;
+  checkWindow() {
+    const viewportHeight = window.innerHeight;
+    window.addEventListener('scroll', () => {
+      if (this.topOrBottom === 'top' && this.oldElem.getBoundingClientRect().top < 130) {
+        this.oldElem.closest('.wrapper__button').querySelector('.popopver').remove();
+        this.oldElem.closest('.wrapper__button').insertAdjacentHTML('beforeend', printTopBottom(wrapperButton));
+        this.getOffset(document.querySelector('.popopver'), this.oldElem);
+        this.topOrBottom = 'bottom';
       }
-    }
-    return arr;
-  }
 
-  checkSum() {
-    if (this.numberCardResult) {
-      return this.numberCard[this.numberCard.length - 1];
-    }
-    return undefined;
-  }
-
-  luna() {
-    if (!this.numberCardResult) return undefined;
-    const arr = this.numberCardResult;
-
-    arr.splice(this.numberCardResult.length - 1, 1);
-    arr.reverse();
-
-    for (let i = 0; i < arr.length; i += 1) {
-      if (!(i % 2)) {
-        arr[i] *= 2;
-        if (arr[i] > 9) arr[i] -= 9;
-      }
-    }
-    const total = arr.reduce((a, b) => a + b);
-    return total % 10;
-  }
-
-  checkCard() {
-    if (!this.numberCardResult) return undefined;
-
-    const numberCardResultStr = this.numberCardResult.join('');
-    if (this.numberCardResult[0] === 4 && (visa.length
-      .find((a) => a === this.numberCardResult.length))) {
-      visaCard.closest('.item').classList.remove('hidden');
-    } else
-    if (masterCard.length === this.numberCardResult.length
-       && (masterCard.startsWith.find((a) => a === Number(numberCardResultStr.substring(0, 2)))
-       || masterCard.checkStart(Number(numberCardResultStr.substring(0, 6))))
-    ) {
-      masterCardCard.closest('.item').classList.remove('hidden');
-    } else
-
-    if (maestro.length.find((a) => a === this.numberCardResult.length)
-    && maestro.startsWith.find((a) => a === Number(numberCardResultStr.substring(0, 4)))
-    ) {
-      maestroCard.closest('.item').classList.remove('hidden');
-    } else
-
-    if (mir.startsWith === Number(numberCardResultStr.substring(0, 4))
-    && mir.length === this.numberCardResult.length
-    ) {
-      mirCard.closest('.item').classList.remove('hidden');
-    }
-
-    return undefined;
-  }
-
-  clearList() {
-    console.log(this.numberCard);
-    cards.forEach((a) => {
-      if (!a.classList.contains('hidden')) {
-        a.classList.add('hidden');
+      if (this.topOrBottom === 'bottom' && viewportHeight - this.oldElem.getBoundingClientRect().bottom < 130) {
+        this.oldElem.closest('.wrapper__button').querySelector('.popopver').remove();
+        this.oldElem.closest('.wrapper__button').insertAdjacentHTML('afterbegin', printTopBottom(wrapperTop));
+        this.getOffset(document.querySelector('.popopver'), this.oldElem);
+        this.topOrBottom = 'top';
       }
     });
+  }
+
+  clickButtons() {
+    buttons.forEach((a, i) => {
+      a.addEventListener('click', (e) => {
+        if (!this.oldElem) {
+          const buttomTop = buttons[i].getBoundingClientRect().top;
+          this.oldElem = e.target;
+          if (buttomTop > 130) {
+            buttons[i].closest('.wrapper__button').insertAdjacentHTML('afterbegin', printTopBottom(wrapperTop));
+            this.getOffset(document.querySelector('.popopver'), buttons[i]);
+            this.topOrBottom = 'top';
+          } else {
+            buttons[i].closest('.wrapper__button').insertAdjacentHTML('beforeend', printTopBottom(wrapperButton));
+            this.getOffset(document.querySelector('.popopver'), buttons[i]);
+            this.topOrBottom = 'bottom';
+          }
+        } else if (this.oldElem === e.target && this.topOrBottom) {
+          this.oldElem.closest('.wrapper__button').querySelector('.popopver').remove();
+          this.oldElem = undefined;
+          this.topOrBottom = undefined;
+        } else if (this.oldElem !== e.target && this.topOrBottom) {
+          const buttomTop = buttons[i].getBoundingClientRect().top;
+          this.oldElem.closest('.wrapper__button').querySelector('.popopver').remove();
+          this.oldElem = e.target;
+          if (buttomTop > 130) {
+            buttons[i].closest('.wrapper__button').insertAdjacentHTML('afterbegin', printTopBottom(wrapperTop));
+            this.getOffset(document.querySelector('.popopver'), buttons[i]);
+            this.topOrBottom = 'top';
+          } else {
+            buttons[i].closest('.wrapper__button').insertAdjacentHTML('beforeend', printTopBottom(wrapperButton));
+            this.getOffset(document.querySelector('.popopver'), buttons[i]);
+            this.topOrBottom = 'bottom';
+          }
+        }
+      });
+    });
+  }
+
+  getOffset(elemPopopver, elemButton) {
+    console.log(this.topOrBottom);
+    // eslint-disable-next-line no-param-reassign
+    elemPopopver.style.left = `${String((Number((getComputedStyle(elemButton).width).substring(0, getComputedStyle(elemButton).width.length - 2))
+    - Number(getComputedStyle(elemPopopver).width.substring(0, getComputedStyle(elemPopopver).width.length - 2))) / 2)}px`;
   }
 }
